@@ -9,24 +9,28 @@ import { NavMenuComponent } from './components/navmenu/navmenu.component';
 import { HomeComponent } from './components/home/home.component';
 import { FetchDataComponent } from './components/fetchdata/fetchdata.component';
 import { CounterComponent } from './components/counter/counter.component';
-
+import {GameComponent} from './components/game/game.component';
+import { ToastModule } from 'ng2-toastr/ng2-toastr';
 @NgModule({
     declarations: [
         AppComponent,
         NavMenuComponent,
         CounterComponent,
         FetchDataComponent,
-        HomeComponent
+        HomeComponent,
+        GameComponent
     ],
     imports: [
         CommonModule,
         HttpModule,
         FormsModule,
+        ToastModule.forRoot(),
         RouterModule.forRoot([
             { path: '', redirectTo: 'home', pathMatch: 'full' },
             { path: 'home', component: HomeComponent },
             { path: 'counter', component: CounterComponent },
             { path: 'fetch-data', component: FetchDataComponent },
+            { path: 'game', component: GameComponent },
             { path: '**', redirectTo: 'home' }
         ])
     ]

@@ -2,7 +2,8 @@ import { NgModule } from '@angular/core';
 import { BrowserModule } from '@angular/platform-browser';
 import { AppModuleShared } from './app.module.shared';
 import { AppComponent } from './components/app/app.component';
-
+import {GameComponent} from './components/game/game.component';
+import { ToastModule } from 'ng2-toastr/ng2-toastr';
 @NgModule({
     bootstrap: [ AppComponent ],
     imports: [
