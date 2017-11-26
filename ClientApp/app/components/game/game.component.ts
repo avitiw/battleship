@@ -33,44 +33,29 @@ export class GameComponent {
     this.toastr.setRootViewContainerRef(_vcr);
     this.createBoards();
     this.initPusher(); 
-    //this.listenForChanges(); 
+    this.listenForChanges(); 
   }
   
-  initPusher() : GameComponent {
-    // findOrCreate unique channel ID
-    let id = undefined;//this.getQueryParam('id');
-    if (!id) {
-      id = this.getUniqueId();
-      //window.location.search = window.location.search ? '&id=' + id : 'id=' + id;
-    }
+  initPusher() : GameComponent { 
+    let id = this.getUniqueId();      
     this.gameId = id;
     this.signalRService.startConnection();
-    /*
-    // init pusher
-    // const pusher = new Pusher('APP_KEY', {
-    //   authEndpoint: '/pusher/auth',
-    //   cluster: 'eu'
-    // });
-    // bind to relevant channels
-    // this.pusherChannel = pusher.subscribe(id);
-    // this.pusherChannel.bind('pusher:member_added', member => { this.players++ })
-    // this.pusherChannel.bind('pusher:subscription_succeeded', members => {
-    //   this.players = members.count;
-    //   this.setPlayer(this.players);
-    //   this.toastr.success("Success", 'Connected!');
-    // })
-    // this.pusherChannel.bind('pusher:member_removed', member => { this.players-- });
-    */
+    
+    this.signalRService.gameUserEvent().subscribe(data=>{
+      console.log("Recieved User Joined msg ");
+      console.log(data);
+      this.players = data.count;
+    });
+     
     return this;
   }
 
-  listenForChanges() : GameComponent {
-    this.pusherChannel.bind('clientfire', (obj:any) => {
+  listenForChanges() : void {
+    this.signalRService.clientFireEvent().subscribe(obj =>{
       this.canPlay = !this.canPlay;
       this.boards[obj.boardId] = obj.board;
       this.boards[obj.player].player.score = obj.score;
-    });
-    return this;
+    });     
   }
 
   setPlayer(players:number = 0) : GameComponent {
@@ -155,7 +140,8 @@ export class GameComponent {
     return this.boards.find(board => board.player.score >= BOARD_SIZE);    
   }
   Join(key:string){
-    alert("Joining game " + key);
+    
+    this.signalRService.joingame(key);  
   }
   get validPlayer(): boolean {
     return (this.players >= NUM_PLAYERS) && (this.player < NUM_PLAYERS);

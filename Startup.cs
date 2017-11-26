@@ -7,6 +7,7 @@ using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.SpaServices.Webpack;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Battleship;
 
 namespace battleship
 {
@@ -45,7 +46,7 @@ namespace battleship
             app.UseStaticFiles();
             app.UseSignalR(routes =>
                         {
-                            routes.MapHub<Chat>("chat");
+                            routes.MapHub<GameMessgeHub>("gamepush");
             }); 
             app.UseMvc(routes =>
             {

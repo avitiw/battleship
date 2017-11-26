@@ -5,39 +5,53 @@ import { ReplaySubject } from 'rxjs/ReplaySubject';
 
 @Injectable()
 export class GameSignalRService{
-    private chatMessageHub : HubConnection;
+    private gameMessageHub : HubConnection;
 
-    private messageObservable : ReplaySubject<string>;
-
-    public sendMessageEvent = () => this.messageObservable.asObservable();
+    private clientFireObservable : ReplaySubject<any>;
+    private gameUsersObservable : ReplaySubject<any>;
+    
+    public gameUserEvent = () => this.gameUsersObservable.asObservable();
+    public clientFireEvent = () => this.clientFireObservable.asObservable();
 
     constructor(@Inject('BASE_URL') private baseUrl :string){
         console.log(baseUrl);
 
-        let url = baseUrl + 'chat';
+        let url = baseUrl + 'gamepush';
 
-        this.chatMessageHub = new HubConnection(url);
-        this.messageObservable = new ReplaySubject<string>();
+        this.gameMessageHub = new HubConnection(url);
+        this.clientFireObservable = new ReplaySubject<any>();
+        this.gameUsersObservable = new ReplaySubject<any>();
     }
     public startConnection(): void {
         if (typeof window !== 'undefined') {
             this.start();
         }
     }
-    public sendMessage(msg :string) {
-        this.chatMessageHub.invoke('Send', msg);
+    public clientfire(msg:any):void{
+        this.gameMessageHub.invoke('clientfire',msg);
     }
+    public joingame(key:string):void{
+        this.gameMessageHub.invoke('joinGame',key);
+    }
+    
     private start(){
-        this.chatMessageHub.start().then(
+        this.gameMessageHub.start().then(
             () =>{
                 console.log('SignalR connection was established.');
-                this.chatMessageHub.on('Send',
-            data=>{
-                this.messageObservable.next(data);
-            });
-            this.sendMessage('test');
+                this.gameMessageHub.on('clientfire',
+                    data=>{
+                        this.clientFireObservable.next(data);
+                });
+                this.gameMessageHub.on('userJoined',(key:string,count:number)=>{
+                    console.log(key + " " + count);
+                    var msg:any = {};
+                    msg.key = key;
+                    msg.count = count;
+                    this.gameUsersObservable.next(msg);
+                } );
             }
         );
         
     }
+    
 }
