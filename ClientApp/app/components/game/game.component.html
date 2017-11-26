@@ -24,7 +24,14 @@
   
         <div *ngIf="players < 2">
           <h2>Waiting for 2nd user to join...</h2>
-          <h3 class="subtitle is-6">You can invite them with this link: {{ gameUrl }}?id={{ gameId }}. You can also open <a href="{{ gameUrl }}?id={{ gameId }}" target="_blank">this link</a> in a new browser, to play all by yourself.</h3>
+          <h3 class="subtitle is-6">You can invite them with this key: {{ gameId }}. </h3>
+            <h2>--  Or  --</h2>
+          <h2> Join another game </h2>
+          <div> 
+            <label>Key: </label>          
+           <input type="text" #key />
+           <button (click)="Join(key.value)">Join</button>
+        </div>
         </div>
   
         <div class="columns" *ngIf="validPlayer">
@@ -54,7 +61,7 @@
         <span class="tag is-danger" *ngIf="!canPlay">Other player's turn.</span>
         <h5 class="title"><small>{{ players }} player(s) in game</small></h5>
       </div>
-  
+       
   
     </div>
   </div>

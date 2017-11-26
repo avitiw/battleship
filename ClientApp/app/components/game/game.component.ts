@@ -1,8 +1,10 @@
 import { Component,Inject, ViewContainerRef } from '@angular/core';
 import { ToastsManager } from 'ng2-toastr/ng2-toastr';
 import { BoardService } from './board.service'
+import { GameSignalRService } from './game-signalr.service'
 import { Board,Tile } from './board'
 import { DOCUMENT } from '@angular/platform-browser';
+
 declare const Pusher: any;
 const NUM_PLAYERS = 2;
 const BOARD_SIZE = 6;
@@ -11,7 +13,7 @@ const BOARD_SIZE = 6;
   selector: 'game-root',
   templateUrl: './game.component.html',
   styleUrls: ['./game.component.css'],
-  providers: [BoardService]
+  providers: [BoardService,GameSignalRService]
 })
 
 export class GameComponent {
@@ -19,18 +21,21 @@ export class GameComponent {
   canPlay: boolean = true;
   player: number = 0;
   players: number = 0;
+   
   gameId: string; 
+  
   constructor( 
     private toastr: ToastsManager,
     private _vcr: ViewContainerRef,
     private boardService: BoardService,
+    private signalRService : GameSignalRService
   ) {
     this.toastr.setRootViewContainerRef(_vcr);
     this.createBoards();
-    this.initPusher();
+    this.initPusher(); 
     //this.listenForChanges(); 
   }
-
+  
   initPusher() : GameComponent {
     // findOrCreate unique channel ID
     let id = undefined;//this.getQueryParam('id');
@@ -39,6 +44,7 @@ export class GameComponent {
       //window.location.search = window.location.search ? '&id=' + id : 'id=' + id;
     }
     this.gameId = id;
+    this.signalRService.startConnection();
     /*
     // init pusher
     // const pusher = new Pusher('APP_KEY', {
@@ -59,7 +65,7 @@ export class GameComponent {
   }
 
   listenForChanges() : GameComponent {
-    this.pusherChannel.bind('client-fire', (obj:any) => {
+    this.pusherChannel.bind('clientfire', (obj:any) => {
       this.canPlay = !this.canPlay;
       this.boards[obj.boardId] = obj.board;
       this.boards[obj.player].player.score = obj.score;
@@ -148,7 +154,9 @@ export class GameComponent {
   get winner () : Board | undefined {
     return this.boards.find(board => board.player.score >= BOARD_SIZE);    
   }
-
+  Join(key:string){
+    alert("Joining game " + key);
+  }
   get validPlayer(): boolean {
     return (this.players >= NUM_PLAYERS) && (this.player < NUM_PLAYERS);
   }

@@ -23,6 +23,7 @@ namespace battleship
         public void ConfigureServices(IServiceCollection services)
         {
             services.AddMvc();
+            services.AddSignalR();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -42,7 +43,10 @@ namespace battleship
             }
 
             app.UseStaticFiles();
-
+            app.UseSignalR(routes =>
+                        {
+                            routes.MapHub<Chat>("chat");
+            }); 
             app.UseMvc(routes =>
             {
                 routes.MapRoute(

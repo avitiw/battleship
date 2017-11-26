@@ -13,7 +13,7 @@ export class BoardService {
   constructor() { }
 
   createBoard(size:number = 5) : BoardService {
-    let tiles:any =  [];
+    let tiles:Tile[][] =  [];
     // create tiles for board
     for(let i=0; i < size; i++) {
       tiles[i]= [];
