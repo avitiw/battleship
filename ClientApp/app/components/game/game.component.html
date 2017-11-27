@@ -1,8 +1,7 @@
 <div class="section">
     <div class="container">
       <div class="content">
-        <h1 class="title">Ready to sink some battleships?</h1>
-        <h6 class="subtitle is-6"><strong>Pusher Battleship</strong></h6>
+        <h1 class="title">Ready to sink some battleships?</h1> 
   
         <hr>
   
@@ -22,14 +21,11 @@
           </div>
         </div>
   
-        <div *ngIf="players < 2">
-          <h2>Waiting for 2nd user to join...</h2>
-          <h3 class="subtitle is-6">You can invite them with this key: {{ gameId }}. </h3>
-            <h2>--  Or  --</h2>
-          <h2> Join another game </h2>
+        <div *ngIf="players < 2">           
+          <h2> Join  game </h2>
           <div> 
             <label>Key: </label>          
-           <input type="text" #key />
+           <input type="text" #key [(ngModel)]="gameId" />
            <button (click)="Join(key.value)">Join</button>
         </div>
         </div>

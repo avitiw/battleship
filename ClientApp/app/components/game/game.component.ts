@@ -10,7 +10,7 @@ const NUM_PLAYERS = 2;
 const BOARD_SIZE = 6;
 
 @Component({
-  selector: 'game-root',
+  selector: 'battleshipgame',
   templateUrl: './game.component.html',
   styleUrls: ['./game.component.css'],
   providers: [BoardService,GameSignalRService]
@@ -23,14 +23,14 @@ export class GameComponent {
   players: number = 0;
    
   gameId: string; 
-  
-  constructor( 
-    private toastr: ToastsManager,
+  playerId :string;
+  //private toastr: ToastsManager,
+  constructor(     
     private _vcr: ViewContainerRef,
     private boardService: BoardService,
     private signalRService : GameSignalRService
   ) {
-    this.toastr.setRootViewContainerRef(_vcr);
+    //this.toastr.setRootViewContainerRef(_vcr);
     this.createBoards();
     this.initPusher(); 
     this.listenForChanges(); 
@@ -39,12 +39,14 @@ export class GameComponent {
   initPusher() : GameComponent { 
     let id = this.getUniqueId();      
     this.gameId = id;
+    this.playerId = this.getUniqueUserId();
     this.signalRService.startConnection();
     
     this.signalRService.gameUserEvent().subscribe(data=>{
       console.log("Recieved User Joined msg ");
       console.log(data);
-      this.players = data.count;
+      this.players = data.count;  
+      this.setPlayer(data.playerId);   
     });
      
     return this;
@@ -52,18 +54,32 @@ export class GameComponent {
 
   listenForChanges() : void {
     this.signalRService.clientFireEvent().subscribe(obj =>{
+      console.log('recieved clientfire');
+      console.log(obj);
       this.canPlay = !this.canPlay;
       this.boards[obj.boardId] = obj.board;
       this.boards[obj.player].player.score = obj.score;
     });     
   }
 
-  setPlayer(players:number = 0) : GameComponent {
-    this.player = players - 1;
+  setPlayer(playerID:string) : GameComponent {
+    /*this.player = players - 1;
     if (players == 1) {
       this.canPlay = true;
     } else if (players == 2) {
       this.canPlay = false;
+    }
+    */
+    if(this.players ==  1){
+      if(this.playerId === playerID){
+        // your are the first player
+        this.player = 0;
+        this.canPlay = true;
+      }else{
+        this.player = 1;
+        this.canPlay = false;
+      }     
+
     }
     return this;
   }
@@ -78,17 +94,19 @@ export class GameComponent {
     }
 
     if (tile.value == 1) {
-      this.toastr.success("You got this.", "HURRAAA! YOU SANK A SHIP!");
+      //this.toastr.success("You got this.", "HURRAAA! YOU SANK A SHIP!");
       this.boards[boardId].tiles[row][col].status = 'win';
       this.boards[this.player].player.score++;
     } else {
-      this.toastr.info("Keep trying fam.", "OOPS! YOU MISSED THIS TIME");
+      //this.toastr.info("Keep trying fam.", "OOPS! YOU MISSED THIS TIME");
       this.boards[boardId].tiles[row][col].status = 'fail'
     }
     this.canPlay = false;
     this.boards[boardId].tiles[row][col].used = true;
     this.boards[boardId].tiles[row][col].value = "X";
-    this.pusherChannel.trigger('client-fire', {
+    
+    //this.pusherChannel.trigger('client-fire',
+    this.signalRService.clientfire( {
       player: this.player,
       score: this.boards[this.player].player.score,
       boardId: boardId,
@@ -105,19 +123,19 @@ export class GameComponent {
 
   checkValidHit(boardId: number, tile: any) : boolean {
     if (boardId == this.player) {
-      this.toastr.error("Don't commit suicide.", "You can't hit your own board.")
+      //this.toastr.error("Don't commit suicide.", "You can't hit your own board.")
       return false;
     }
     if (this.winner) {
-      this.toastr.error("Game is over");
+     // this.toastr.error("Game is over");
       return false;
     }
     if (!this.canPlay) {
-      this.toastr.error("A bit too eager.", "It's not your turn to play.");
+      //this.toastr.error("A bit too eager.", "It's not your turn to play.");
       return false;
     }
     if(tile.value == "X") {
-      this.toastr.error("Don't waste your torpedos.", "You already shot here.");
+      //this.toastr.error("Don't waste your torpedos.", "You already shot here.");
       return false;
     }
     return true;
@@ -127,7 +145,9 @@ export class GameComponent {
     var match = RegExp('[?&]' + name + '=([^&]*)').exec(window.location.search);
     return match && decodeURIComponent(match[1].replace(/\+/g, ' '));
   }
-
+  getUniqueUserId () {
+    return 'user-' + Math.random().toString(36).substr(2, 8);
+  }
   getUniqueId () {
     return 'presence-' + Math.random().toString(36).substr(2, 8);
   }
@@ -141,7 +161,7 @@ export class GameComponent {
   }
   Join(key:string){
     
-    this.signalRService.joingame(key);  
+    this.signalRService.joingame(key,this.playerId);  
   }
   get validPlayer(): boolean {
     return (this.players >= NUM_PLAYERS) && (this.player < NUM_PLAYERS);

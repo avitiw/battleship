@@ -515,6 +515,11 @@
       "from": "builtin-status-codes@>=3.0.0 <4.0.0",
       "resolved": "https://registry.npmjs.org/builtin-status-codes/-/builtin-status-codes-3.0.0.tgz"
     },
+    "bulma": {
+      "version": "0.6.1",
+      "from": "bulma@latest",
+      "resolved": "https://registry.npmjs.org/bulma/-/bulma-0.6.1.tgz"
+    },
     "bytes": {
       "version": "2.4.0",
       "from": "bytes@2.4.0",

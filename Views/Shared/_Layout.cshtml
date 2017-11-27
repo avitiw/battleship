@@ -7,6 +7,24 @@
     <base href="~/" />
 
     <link rel="stylesheet" href="~/dist/vendor.css" asp-append-version="true" />
+    <link rel="stylesheet" href="~/dist/bulma.css" asp-append-version="true" />
+    <style>
+        .container {
+    padding: 50px;
+  }
+  .battleship-tile {
+    color: black;
+  }
+  .win {
+    background-color: #23d160;
+    color: #fff;
+  }
+  .fail {
+    background-color: #ff3860;
+    color: #fff;
+  }
+   
+    </style>
 </head>
 <body>
     @RenderBody()

@@ -9,9 +9,11 @@ export class GameSignalRService{
 
     private clientFireObservable : ReplaySubject<any>;
     private gameUsersObservable : ReplaySubject<any>;
-    
+    private gameSubscriptionObservable :ReplaySubject<any>;
+
     public gameUserEvent = () => this.gameUsersObservable.asObservable();
     public clientFireEvent = () => this.clientFireObservable.asObservable();
+    public gameSubscriptionEvent = () => this.gameSubscriptionObservable.asObservable();
 
     constructor(@Inject('BASE_URL') private baseUrl :string){
         console.log(baseUrl);
@@ -21,6 +23,7 @@ export class GameSignalRService{
         this.gameMessageHub = new HubConnection(url);
         this.clientFireObservable = new ReplaySubject<any>();
         this.gameUsersObservable = new ReplaySubject<any>();
+        this.gameSubscriptionObservable = new ReplaySubject<any>();
     }
     public startConnection(): void {
         if (typeof window !== 'undefined') {
@@ -30,8 +33,8 @@ export class GameSignalRService{
     public clientfire(msg:any):void{
         this.gameMessageHub.invoke('clientfire',msg);
     }
-    public joingame(key:string):void{
-        this.gameMessageHub.invoke('joinGame',key);
+    public joingame(key:string,playerId:string):void{
+        this.gameMessageHub.invoke('joinGame',key,playerId);
     }
     
     private start(){
@@ -42,13 +45,17 @@ export class GameSignalRService{
                     data=>{
                         this.clientFireObservable.next(data);
                 });
-                this.gameMessageHub.on('userJoined',(key:string,count:number)=>{
+                this.gameMessageHub.on('userJoined',(key:string,count:number,playerId:string)=>{
                     console.log(key + " " + count);
                     var msg:any = {};
                     msg.key = key;
                     msg.count = count;
+                    msg.playerId = playerId;
                     this.gameUsersObservable.next(msg);
-                } );
+                });
+                this.gameMessageHub.on('game-subscription',data=>{
+                    this.gameSubscriptionObservable.next(data);
+                });
             }
         );
         
