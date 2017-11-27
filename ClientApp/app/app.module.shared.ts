@@ -1,38 +1,22 @@
 import { NgModule } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { HttpModule } from '@angular/http';
-import { RouterModule } from '@angular/router';
-
-import { AppComponent } from './components/app/app.component';
-import { NavMenuComponent } from './components/navmenu/navmenu.component';
-import { HomeComponent } from './components/home/home.component';
-import { FetchDataComponent } from './components/fetchdata/fetchdata.component';
-import { CounterComponent } from './components/counter/counter.component';
-import {GameComponent} from './components/game/game.component';
+import { HttpModule } from '@angular/http'; 
 import { ToastModule } from 'ng2-toastr/ng2-toastr';
+import { AppComponent } from './components/app/app.component';
+import {GameComponent} from './components/game/game.component';
+
+
 @NgModule({
     declarations: [
         AppComponent,
-        NavMenuComponent,
-        CounterComponent,
-        FetchDataComponent,
-        HomeComponent,
         GameComponent
     ],
     imports: [
         CommonModule,
         HttpModule,
         FormsModule,
-        ToastModule.forRoot(),
-        RouterModule.forRoot([
-            { path: '', redirectTo: 'game', pathMatch: 'full' },
-            { path: 'home', component: HomeComponent },
-            { path: 'counter', component: CounterComponent },
-            { path: 'fetch-data', component: FetchDataComponent },
-            { path: 'game', component: GameComponent },
-            { path: '**', redirectTo: 'home' }
-        ])
+        ToastModule.forRoot()             
     ]
 })
 export class AppModuleShared {

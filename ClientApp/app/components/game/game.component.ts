@@ -1,11 +1,9 @@
 import { Component,Inject, ViewContainerRef } from '@angular/core';
 import { ToastsManager } from 'ng2-toastr/ng2-toastr';
-import { BoardService } from './board.service'
-import { GameSignalRService } from './game-signalr.service'
-import { Board,Tile } from './board'
-import { DOCUMENT } from '@angular/platform-browser';
-
-declare const Pusher: any;
+import { BoardService } from './board.service';
+import { GameSignalRService } from './game-signalr.service';
+import { Board,Tile } from './board' ;
+ 
 const NUM_PLAYERS = 2;
 const BOARD_SIZE = 6;
 
@@ -13,18 +11,19 @@ const BOARD_SIZE = 6;
   selector: 'battleshipgame',
   templateUrl: './game.component.html',
   styleUrls: ['./game.component.css'],
-  providers: [BoardService,GameSignalRService]
+  providers: [
+    BoardService,
+    GameSignalRService
+  ]
 })
 
-export class GameComponent {
-  pusherChannel: any;
+export class GameComponent {  
   canPlay: boolean = true;
   player: number = 0;
-  players: number = 0;
-   
+  players: number = 0;   
   gameId: string; 
   playerId :string;
-  //
+  
   constructor(  
     private toastr: ToastsManager,   
     private _vcr: ViewContainerRef,
@@ -33,27 +32,19 @@ export class GameComponent {
   ) {
     this.toastr.setRootViewContainerRef(_vcr);
     this.createBoards();
-    this.initPusher(); 
+    this.init(); 
     this.listenForChanges(); 
   }
   
-  initPusher() : GameComponent { 
-    let id = this.getUniqueId();      
-    this.gameId = id;
+  init()  {         
+    this.gameId = this.getUniqueId();
     this.playerId = this.getUniqueUserId();
-    this.signalRService.startConnection();
-    
-    this.signalRService.gameUserEvent().subscribe(data=>{
-      console.log("Recieved User Joined msg ");
-      console.log(data);
-      this.players = data.count;  
-      this.setPlayer(data.playerId);   
-    });
-     
-    return this;
   }
 
   listenForChanges() : void {
+
+    this.signalRService.startConnection();
+
     this.signalRService.clientFireEvent().subscribe(obj =>{
       console.log('recieved clientfire');
       console.log(obj);
@@ -61,16 +52,16 @@ export class GameComponent {
       this.boards[obj.boardId] = obj.board;
       this.boards[obj.player].player.score = obj.score;
     });     
+
+    this.signalRService.gameUserEvent().subscribe(data=>{
+      console.log("Recieved User Joined msg ");
+      console.log(data);
+      this.players = data.count;  
+      this.setPlayer(data.playerId);   
+    });    
   }
 
-  setPlayer(playerID:string) : GameComponent {
-    /*this.player = players - 1;
-    if (players == 1) {
-      this.canPlay = true;
-    } else if (players == 2) {
-      this.canPlay = false;
-    }
-    */
+  setPlayer(playerID:string){    
     if(this.players ==  1){
       if(this.playerId === playerID){
         // your are the first player
@@ -80,19 +71,17 @@ export class GameComponent {
       }else{
         this.player = 1;
         this.canPlay = false;
-      }     
-
+      }
     }
-    return this;
   }
 
-  fireTorpedo(e:any) : GameComponent|undefined {
+  fireTorpedo(e:any)  {
     let id = e.target.id,
       boardId = id.substring(1,2),
       row = id.substring(2,3), col = id.substring(3,4),
       tile = this.boards[boardId].tiles[row][col];
     if (!this.checkValidHit(boardId, tile)) {
-      return undefined;
+      return;
     }
 
     if (tile.value == 1) {
@@ -106,21 +95,18 @@ export class GameComponent {
     this.canPlay = false;
     this.boards[boardId].tiles[row][col].used = true;
     this.boards[boardId].tiles[row][col].value = "X";
-    
-    //this.pusherChannel.trigger('client-fire',
+     
     this.signalRService.clientfire( {
       player: this.player,
       score: this.boards[this.player].player.score,
       boardId: boardId,
       board: this.boards[boardId]
-    });
-    return this;
+    });    
   }
 
-  createBoards() : GameComponent {
+  createBoards() {
     for (let i = 0; i < NUM_PLAYERS; i++)
-      this.boardService.createBoard(BOARD_SIZE);
-    return this;
+      this.boardService.createBoard(BOARD_SIZE);    
   }
 
   checkValidHit(boardId: number, tile: any) : boolean {
@@ -142,11 +128,10 @@ export class GameComponent {
     }
     return true;
   }
-
-  getQueryParam(name:string) {
-    var match = RegExp('[?&]' + name + '=([^&]*)').exec(window.location.search);
-    return match && decodeURIComponent(match[1].replace(/\+/g, ' '));
+  Join(key:string){    
+    this.signalRService.joingame(key,this.playerId);  
   }
+
   getUniqueUserId () {
     return 'user-' + Math.random().toString(36).substr(2, 8);
   }
@@ -160,11 +145,8 @@ export class GameComponent {
 
   get winner () : Board | undefined {
     return this.boards.find(board => board.player.score >= BOARD_SIZE);    
-  }
-  Join(key:string){
-    
-    this.signalRService.joingame(key,this.playerId);  
-  }
+  }  
+
   get validPlayer(): boolean {
     return (this.players >= NUM_PLAYERS) && (this.player < NUM_PLAYERS);
   }

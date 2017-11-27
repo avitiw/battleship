@@ -13,8 +13,7 @@ namespace Battleship{
         private static Dictionary<string,int> gameUsers = new Dictionary<string, int>();
        
         public Task clientfire(ClientFireMessage msg){
-            return Clients.AllExcept(new string[]{ Context.ConnectionId}).InvokeAsync("clientfire",msg);
-            //return Clients.All.InvokeAsync("clientfire",msg);
+            return Clients.AllExcept(new string[]{ Context.ConnectionId}).InvokeAsync("clientfire",msg);            
         }
                  
         public Task joinGame(string gameKey,string playerId)
