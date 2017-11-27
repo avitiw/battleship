@@ -24,13 +24,14 @@ export class GameComponent {
    
   gameId: string; 
   playerId :string;
-  //private toastr: ToastsManager,
-  constructor(     
+  //
+  constructor(  
+    private toastr: ToastsManager,   
     private _vcr: ViewContainerRef,
     private boardService: BoardService,
     private signalRService : GameSignalRService
   ) {
-    //this.toastr.setRootViewContainerRef(_vcr);
+    this.toastr.setRootViewContainerRef(_vcr);
     this.createBoards();
     this.initPusher(); 
     this.listenForChanges(); 
@@ -75,6 +76,7 @@ export class GameComponent {
         // your are the first player
         this.player = 0;
         this.canPlay = true;
+        this.toastr.info("You have subscribed successfully")
       }else{
         this.player = 1;
         this.canPlay = false;
@@ -94,11 +96,11 @@ export class GameComponent {
     }
 
     if (tile.value == 1) {
-      //this.toastr.success("You got this.", "HURRAAA! YOU SANK A SHIP!");
+      this.toastr.success("You got this.", "HURRAAA! YOU SANK A SHIP!");
       this.boards[boardId].tiles[row][col].status = 'win';
       this.boards[this.player].player.score++;
     } else {
-      //this.toastr.info("Keep trying fam.", "OOPS! YOU MISSED THIS TIME");
+      this.toastr.info("Keep trying fam.", "OOPS! YOU MISSED THIS TIME");
       this.boards[boardId].tiles[row][col].status = 'fail'
     }
     this.canPlay = false;
@@ -123,19 +125,19 @@ export class GameComponent {
 
   checkValidHit(boardId: number, tile: any) : boolean {
     if (boardId == this.player) {
-      //this.toastr.error("Don't commit suicide.", "You can't hit your own board.")
+      this.toastr.error("Don't commit suicide.", "You can't hit your own board.")
       return false;
     }
     if (this.winner) {
-     // this.toastr.error("Game is over");
+      this.toastr.error("Game is over");
       return false;
     }
     if (!this.canPlay) {
-      //this.toastr.error("A bit too eager.", "It's not your turn to play.");
+      this.toastr.error("A bit too eager.", "It's not your turn to play.");
       return false;
     }
     if(tile.value == "X") {
-      //this.toastr.error("Don't waste your torpedos.", "You already shot here.");
+      this.toastr.error("Don't waste your torpedos.", "You already shot here.");
       return false;
     }
     return true;
