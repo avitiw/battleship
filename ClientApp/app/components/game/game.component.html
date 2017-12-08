@@ -52,7 +52,7 @@
       </div>
   
   
-      <div class="has-text-centered">
+      <div class="has-text-centered" *ngIf="players >0">
         <span class="tag is-warning" *ngIf="canPlay">Your turn!</span>
         <span class="tag is-danger" *ngIf="!canPlay">Other player's turn.</span>
         <h5 class="title"><small>{{ players }} player(s) in game</small></h5>

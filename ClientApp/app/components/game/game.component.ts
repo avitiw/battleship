@@ -34,11 +34,13 @@ export class GameComponent {
     this.createBoards();
     this.init(); 
     this.listenForChanges(); 
+    
   }
   
   init()  {         
     this.gameId = this.getUniqueId();
     this.playerId = this.getUniqueUserId();
+    this.canPlay = false;
   }
 
   listenForChanges() : void {
@@ -128,6 +130,7 @@ export class GameComponent {
     }
     return true;
   }
+
   Join(key:string){    
     this.signalRService.joingame(key,this.playerId);  
   }
