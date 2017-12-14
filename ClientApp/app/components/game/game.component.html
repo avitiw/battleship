@@ -36,7 +36,7 @@
               PLAYER {{ board.player.id }} <span class="tag is-info" *ngIf="i == player">You</span>
               // <strong>SCORE: {{ board.player.score }}</strong>
             </h5>
-            <table class="is-bordered" [style.opacity] = "i == player ? 0.5 : 1">
+            <table class="board is-bordered" [style.opacity] = "i == player ? 0.5 : 1">
               <tr *ngFor="let row of board.tiles; let j = index">
                 <td *ngFor="let col of row; let k = index"
                 (click) = "fireTorpedo($event)"
