@@ -10,7 +10,14 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bulma/0.6.1/css/bulma.min.css"  />    
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/ng2-toastr@4.1.2/bundles/ng2-toastr.min.css"  WE />
     <style>
-        .container {
+      body{
+        height: 100vh;
+     background: #0A212E;
+  margin: 0px;
+  overflow: hidden;
+  animation: color-loop 18s infinite;
+      }
+  .container {
     padding: 50px;
   }
   .battleship-tile {
@@ -25,8 +32,21 @@
     color: #fff;
   }
    .board{
-     transform: rotateX(60deg) rotateY(0deg) rotateZ(-45deg);
+     transform: rotateX(45deg) rotateY(0deg) rotateZ(-30deg);
    }
+   
+  @@keyframes color-loop {
+  0% {
+    background: #2CAB5B;
+  }
+  
+  75% {
+    background: #4286F3;
+  }
+  100% {
+    background: #2CAB5B;
+  }
+}
     </style>
 </head>
 <body>
